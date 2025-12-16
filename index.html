@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Driving Simulator Project (Example)</title>
+  <meta name="description" content="Example project website: a safety-first, VR-inspired driving simulator prototype with hardware + development timeline." />
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#10131a;
+      --panel2:#0f1117;
+      --text:#e9edf1;
+      --muted:#a7b0bb;
+      --line:rgba(255,255,255,.10);
+      --glow:rgba(80,180,255,.25);
+      --accent:#7dd3fc;
+      --accent2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --radius:18px;
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(125,211,252,.15), transparent 60%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(167,139,250,.14), transparent 58%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1100px; margin:0 auto; padding:0 18px}
+    .pill{
+      display:inline-flex; gap:10px; align-items:center;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px; border-radius:999px;
+      color:var(--muted); font-size:13px;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background:var(--accent)}
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background:rgba(11,12,16,.72);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .brandMark{
+      width:34px; height:34px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(125,211,252,.9), rgba(167,139,250,.9));
+      box-shadow:0 10px 25px rgba(125,211,252,.18);
+    }
+    .navLinks{
+      display:flex; gap:16px; align-items:center;
+      flex-wrap:wrap;
+    }
+    .navLinks a{
+      padding:8px 10px; border-radius:10px;
+      color:var(--muted);
+      border:1px solid transparent;
+    }
+    .navLinks a:hover{
+      color:var(--text);
+      border-color:var(--line);
+      background:rgba(255,255,255,.03);
+    }
+
+    /* HERO */
+    .hero{
+      padding:44px 0 26px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .heroMain{padding:26px}
+    h1{margin:10px 0 10px; font-size:40px; line-height:1.05}
+    .lead{color:var(--muted); font-size:15px; line-height:1.5; margin:0 0 18px}
+    .ctaRow{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 12px; border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      transition:.15s transform;
+      font-weight:600;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btnPrimary{
+      border-color:rgba(125,211,252,.35);
+      background:linear-gradient(135deg, rgba(125,211,252,.18), rgba(167,139,250,.14));
+      box-shadow:0 14px 35px rgba(125,211,252,.10);
+    }
+    .heroSide{
+      position:relative;
+      min-height:260px;
+      display:flex;
+      flex-direction:column;
+    }
+    .mediaStack{
+      display:grid;
+      grid-template-rows: 1fr auto;
+      height:100%;
+    }
+    .heroMedia{
+      position:relative;
+      background:#0d1018;
+      border-bottom:1px solid var(--line);
+      min-height:220px;
+      overflow:hidden;
+    }
+    .heroMedia img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter: brightness(.75) contrast(1.05);
+      transform:scale(1.02);
+    }
+    .heroMedia::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(700px 320px at 30% 10%, rgba(125,211,252,.18), transparent 60%),
+                  linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.45));
+      pointer-events:none;
+    }
+    .heroBadges{
+      padding:14px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+      background:rgba(255,255,255,.02);
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .badge b{color:var(--text); font-weight:700}
+
+    /* SECTIONS */
+    section{padding:30px 0}
+    .sectionTitle{
+      display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
+      margin-bottom:14px;
+    }
+    h2{margin:0; font-size:24px}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.45}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+    .mini{
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.03);
+    }
+    .mini h3{margin:0 0 8px; font-size:16px}
+    .mini p{margin:0; color:var(--muted); font-size:14px; line-height:1.45}
+    .tagRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .tag{
+      font-size:12px; color:var(--muted);
+      padding:6px 10px; border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.02);
+    }
+
+    /* CAROUSEL */
+    .carousel{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    .frame{
+      position:relative;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:#0d1018;
+      box-shadow:var(--shadow);
+      min-height:340px;
+    }
+    .slide{
+      position:absolute; inset:0;
+      opacity:0;
+      transition: opacity .25s ease;
+      pointer-events:none;
+    }
+    .slide.active{opacity:1; pointer-events:auto}
+    .slide img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter: brightness(.55) contrast(1.05);
+      transform:scale(1.02);
+    }
+    .slide::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(650px 280px at 20% 10%, rgba(125,211,252,.18), transparent 58%),
+                  radial-gradient(520px 250px at 80% 20%, rgba(167,139,250,.16), transparent 55%),
+                  linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.55));
+      pointer-events:none;
+    }
+    .hoverOverlay{
+      position:absolute;
+      left:18px; right:18px; bottom:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,12,18,.58);
+      backdrop-filter: blur(10px);
+      border-radius:16px;
+      padding:14px;
+      transform: translateY(8px);
+      opacity:.92;
+      transition: .18s ease;
+    }
+    .frame:hover .hoverOverlay{opacity:1; transform:translateY(0)}
+    .hoverOverlay h3{margin:0 0 6px; font-size:16px}
+    .hoverOverlay p{margin:0; color:var(--muted); font-size:13px; line-height:1.45}
+    .carouselControls{
+      position:absolute;
+      top:16px; left:16px; right:16px;
+      display:flex; justify-content:space-between; align-items:center;
+      pointer-events:none;
+    }
+    .cbtn{
+      pointer-events:auto;
+      width:42px; height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      display:grid; place-items:center;
+      backdrop-filter: blur(10px);
+    }
+    .cbtn:hover{border-color:rgba(125,211,252,.35); box-shadow:0 12px 28px rgba(125,211,252,.10)}
+    .counter{
+      pointer-events:none;
+      font-size:12px; color:var(--muted);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      padding:7px 10px;
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+    }
+    .sidePanel{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .sidePanel h3{margin:0; font-size:16px}
+    .sidePanel p{margin:0; color:var(--muted); font-size:14px; line-height:1.5}
+    .list{margin:0; padding-left:18px; color:var(--muted); font-size:14px; line-height:1.55}
+    .list li{margin:6px 0}
+
+    /* CODE BLOCK */
+    .codeWrap{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:rgba(0,0,0,.35);
+      box-shadow:var(--shadow);
+    }
+    .codeTop{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .codeTop .label{font-size:12px; color:var(--muted)}
+    pre{
+      margin:0;
+      padding:14px 14px 18px;
+      overflow:auto;
+      font-size:12.5px;
+      line-height:1.55;
+      color:#e6eef7;
+      background:transparent;
+    }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+    /* TIMELINE DOTS */
+    .timelineCard{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .timelineHeader{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      align-items:flex-end; margin-bottom:12px;
+    }
+    .timelineHeader h3{margin:0; font-size:16px}
+    .timelineHeader p{margin:6px 0 0; color:var(--muted); font-size:13px}
+    .timelineLine{
+      position:relative;
+      padding:18px 8px 8px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.18);
+    }
+    .timelineLine::before{
+      content:"";
+      position:absolute; left:10px; right:10px; top:38px;
+      height:2px; background:rgba(255,255,255,.16);
+    }
+    .dots{
+      display:grid;
+      grid-template-columns: repeat(14, 1fr); /* 5 Oct + 4 Nov + 5 Dec = 14 */
+      gap:6px;
+      align-items:start;
+    }
+    .dotCell{
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      position:relative;
+    }
+    .tDot{
+      width:16px; height:16px; border-radius:999px;
+      border:1px solid rgba(0,0,0,.45);
+      background:#eaeaea;
+      cursor:pointer;
+      transition:.12s transform;
+      box-shadow:none;
+    }
+    .tDot:hover{transform:scale(1.15)}
+    .tLabel{
+      font-size:11px; color:var(--muted); user-select:none;
+      text-align:center; line-height:1.1;
+    }
+    .tooltip{
+      position:absolute;
+      top:-8px;
+      left:50%;
+      transform:translate(-50%,-100%);
+      width:260px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(10,12,18,.72);
+      backdrop-filter: blur(10px);
+      border-radius:16px;
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
+      transition:.14s ease;
+      box-shadow:0 18px 40px rgba(0,0,0,.45);
+      z-index:10;
+    }
+    .dotCell:hover .tooltip,
+    .dotCell:focus-within .tooltip{opacity:1; pointer-events:auto}
+    .tooltip img{
+      width:100%;
+      height:120px;
+      object-fit:cover;
+      display:block;
+      filter: brightness(.75);
+    }
+    .tooltipBody{padding:10px 10px 12px}
+    .tooltipKicker{color:var(--muted); font-size:12px}
+    .tooltipTitle{margin:6px 0 6px; font-size:13px}
+    .tooltipText{margin:0; color:var(--muted); font-size:12px; line-height:1.35}
+    .tinyNote{font-size:12px; color:var(--muted); margin-top:10px}
+
+    /* FOOTER */
+    footer{
+      padding:30px 0 40px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 940px){
+      .hero{grid-template-columns:1fr; }
+      .carousel{grid-template-columns:1fr; }
+      .grid3{grid-template-columns:1fr}
+      .grid2{grid-template-columns:1fr}
+      .frame{min-height:300px}
+      .dots{grid-template-columns: repeat(7, 1fr)}
+      .tooltip{width:240px}
+    }
+  </style>
+</head>
+
+<body>
+  <!--
+    YOU ONLY NEED THIS ONE FILE: index.html
+
+    1) Put this index.html in your GitHub repo root.
+    2) (Optional) Create a folder: /timeline/ and upload placeholder images with these names:
+        vr.jpg
+        highspeed.gif
+        safety.jpg
+        finalized.jpg
+        components.jpg
+        code.jpg
+        cad.jpg
+        linear-actuator.jpg
+        force-feedback-wheel.jpg
+        hbridge.png
+        breadboard.jpg
+        servos.jpg
+        old-mount.jpg
+        rebuild.jpg
+        coupling.jpg
+        final-mount.jpg
+        checklist.jpg
+    3) If you don’t have these images, it still works—just swap the src paths.
+
+    NOTE: This site labels itself as an EXAMPLE / SAMPLE (fictional timeline) for a class.
+  -->
+
+  <header>
+    <div class="wrap">
+      <div class="nav">
+        <div class="brand">
+          <div class="brandMark" aria-hidden="true"></div>
+          <div>
+            Driving Simulator <span style="color:var(--muted); font-weight:700;">(Example)</span>
+          </div>
+        </div>
+        <nav class="navLinks" aria-label="Primary">
+          <a href="#home">Home</a>
+          <a href="#project">Project</a>
+          <a href="#development">Development</a>
+          <a href="#about">About</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <main id="home" class="wrap">
+    <div class="hero">
+      <div class="card heroMain">
+        <span class="pill"><span class="dot"></span> Sample / Teaching Example • Single-page site</span>
+        <h1>High-speed driving thrills—without the real-world risk.</h1>
+        <p class="lead">
+          This example project shows how students can document a safety-first, VR-inspired steering-feedback prototype:
+          electronics, mechanical mounting, code, and a week-by-week development timeline.
+        </p>
+        <div class="ctaRow">
+          <a class="btn btnPrimary" href="#project">See the Project Build</a>
+          <a class="btn" href="#development">See the Development Timeline</a>
+        </div>
+
+        <div style="margin-top:18px" class="grid3">
+          <div class="mini">
+            <h3>Safety-first design</h3>
+            <p>We design for controlled forces, stable mounting, and predictable behavior—so testing stays safe and repeatable.</p>
+            <div class="tagRow">
+              <span class="tag">Risk reduction</span>
+              <span class="tag">Stable mounting</span>
+              <span class="tag">Power limits</span>
+            </div>
+          </div>
+          <div class="mini">
+            <h3>Hardware prototype</h3>
+            <p>Joystick input → Arduino control → motor rotation → wheel feedback, with multiple coupling & mount iterations.</p>
+            <div class="tagRow">
+              <span class="tag">Arduino</span>
+              <span class="tag">Motor driver</span>
+              <span class="tag">3D print</span>
+            </div>
+          </div>
+          <div class="mini">
+            <h3>Clear documentation</h3>
+            <p>Students can replicate the flow: requirements → experiments → iterations → final demo + reflection.</p>
+            <div class="tagRow">
+              <span class="tag">Timeline</span>
+              <span class="tag">Photos</span>
+              <span class="tag">Code</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card heroSide" aria-label="Hero media">
+        <div class="mediaStack">
+          <div class="heroMedia">
+            <!-- Replace with your GIF or VR pic -->
+            <img src="timeline/highspeed.gif" alt="High-speed driving GIF (placeholder)" onerror="this.src='timeline/vr.jpg';" />
+          </div>
+          <div class="heroBadges">
+            <span class="badge"><b>Media</b> High-speed GIF</span>
+            <span class="badge"><b>VR</b> Concept inspiration</span>
+            <span class="badge"><b>Focus</b> Safety</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- PROJECT -->
+    <section id="project">
+      <div class="sectionTitle">
+        <div>
+          <h2>Project</h2>
+          <p class="sub">
+            Detailed build breakdown: finalized product, what it does, and key components — presented as a dark hover-reveal slideshow.
+          </p>
+        </div>
+        <span class="pill"><span class="dot"></span> “Hardware Side”</span>
+      </div>
+
+      <div class="carousel">
+        <div class="frame" id="projectCarousel" aria-label="Project slideshow">
+          <!-- Slides injected by JS -->
+          <div class="carouselControls">
+            <button class="cbtn" data-prev="project" aria-label="Previous slide">←</button>
+            <div class="counter" id="projectCounter">1 / 1</div>
+            <button class="cbtn" data-next="project" aria-label="Next slide">→</button>
+          </div>
+        </div>
+
+        <div class="sidePanel">
+          <div>
+            <h3>What the finalized prototype does</h3>
+            <p>
+              A joystick controls a motor that provides steering feedback by rotating a wheel mount clockwise/counterclockwise.
+              The goal is to make the “turning sensation” feel responsive and consistent while keeping the system stable and safe.
+            </p>
+          </div>
+
+          <div>
+            <h3>Recommended photos to include (student checklist)</h3>
+            <ul class="list">
+              <li>Finalized product: full setup on a table (wide shot).</li>
+              <li>Close-up: wheel coupling to motor shaft.</li>
+              <li>Close-up: Arduino + wiring (clean and labeled).</li>
+              <li>Close-up: 3D-printed mount (front + side angle).</li>
+            </ul>
+          </div>
+
+          <div class="mini" style="margin-top:2px">
+            <h3>Project video</h3>
+            <p>Paste your demo video link (YouTube embed) below.</p>
+            <div style="margin-top:10px; border:1px solid var(--line); border-radius:14px; overflow:hidden;">
+              <iframe
+                title="Project video"
+                width="100%"
+                height="200"
+                src="https://www.youtube.com/embed/VIDEO_ID_HERE"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px" class="grid2">
+        <div class="codeWrap" aria-label="Current code">
+          <div class="codeTop">
+            <div class="label">Current Arduino-style control code (example)</div>
+            <button class="btn" id="copyCodeBtn" type="button">Copy</button>
+          </div>
+          <pre><code id="codeBlock">// Example Arduino-style code (placeholder)
+// Joystick -> direction + speed -> motor driver pins
+
+const int JOY_X = A0;
+const int IN1 = 8;   // H-bridge IN1
+const int IN2 = 9;   // H-bridge IN2
+const int ENA = 10;  // PWM enable
+
+int deadzone = 60;   // tune to reduce jitter
+
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  Serial.begin(9600);
+}
+
+void drive(int dir, int pwm) {
+  pwm = constrain(pwm, 0, 255);
+  if (dir > 0) { digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); }
+  else if (dir < 0) { digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH); }
+  else { digitalWrite(IN1, LOW); digitalWrite(IN2, LOW); pwm = 0; }
+  analogWrite(ENA, pwm);
+}
+
+void loop() {
+  int x = analogRead(JOY_X);          // 0..1023
+  int centered = x - 512;             // -512..+511
+  int mag = abs(centered);
+
+  int dir = 0;
+  if (mag > deadzone) dir = (centered > 0) ? 1 : -1;
+
+  int pwm = map(constrain(mag, deadzone, 512), deadzone, 512, 80, 255);
+  drive(dir, (dir == 0) ? 0 : pwm);
+
+  Serial.print("x="); Serial.print(x);
+  Serial.print(" dir="); Serial.print(dir);
+  Serial.print(" pwm="); Serial.println((dir==0)?0:pwm);
+
+  delay(12);
+}</code></pre>
+        </div>
+
+        <div class="mini">
+          <h3>Current 3D print model (tension-lock)</h3>
+          <p>
+            The mount locks the car into place using tension so it doesn’t slip under torque.
+            (Add 2–3 photos: front view, side view, and “car installed”.)
+          </p>
+          <div class="tagRow">
+            <span class="tag">Anti-slip</span>
+            <span class="tag">Quick install</span>
+            <span class="tag">Repeatable</span>
+          </div>
+          <div style="margin-top:12px; border:1px solid var(--line); border-radius:16px; overflow:hidden;">
+            <img src="timeline/cad.jpg" alt="3D model render (placeholder)" style="width:100%; height:220px; object-fit:cover; display:block; filter:brightness(.72);" onerror="this.style.display='none'" />
+          </div>
+          <p class="tinyNote">Tip: Use a screenshot of your CAD file as the image here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEVELOPMENT -->
+    <section id="development">
+      <div class="sectionTitle">
+        <div>
+          <h2>Development</h2>
+          <p class="sub">
+            A behind-the-scenes look at the iteration process: ideas we explored, hardware trials, and the timeline of weekly progress.
+          </p>
+        </div>
+        <span class="pill"><span class="dot"></span> Sample Timeline (Fictional)</span>
+      </div>
+
+      <div class="carousel">
+        <div class="frame" id="devCarousel" aria-label="Development slideshow">
+          <!-- Slides injected by JS -->
+          <div class="carouselControls">
+            <button class="cbtn" data-prev="dev" aria-label="Previous slide">←</button>
+            <div class="counter" id="devCounter">1 / 1</div>
+            <button class="cbtn" data-next="dev" aria-label="Next slide">→</button>
+          </div>
+        </div>
+
+        <div class="sidePanel">
+          <div>
+            <h3>Motors we tried (example list)</h3>
+            <ul class="list">
+              <li>SM-S2309S</li>
+              <li>Micro servo 9g SG90</li>
+              <li>Micro servo 9g S51</li>
+              <li>Geekservo motor</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3>Past 3D print model (example notes)</h3>
+            <p>
+              The earlier mount was adapted to a different toy car and focused on constant locking.
+              When the car changed, the mount needed a redesign to stay stable and avoid slip.
+            </p>
+          </div>
+
+          <div class="mini">
+            <h3>December pivot (example narrative)</h3>
+            <p>
+              After repeated direction-control issues, we reset the build: cleaner wiring, fewer variables,
+              and rapid mechanical coupling tests to prevent slip.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px" class="timelineCard">
+        <div class="timelineHeader">
+          <div>
+            <h3>Weekly timeline (1 dot = 1 week)</h3>
+            <p>Hover a dot to see the date, what happened that week, and a representative image.</p>
+          </div>
+          <span class="pill"><span class="dot"></span> Oct + Nov + Dec</span>
+        </div>
+
+        <div class="timelineLine">
+          <div class="dots" id="timelineDots" aria-label="Timeline dots">
+            <!-- Dots injected by JS -->
+          </div>
+          <p class="tinyNote">
+            For a class example, mix “reference images” (actuators, H-bridge diagrams) with “student photo prompts” (your wiring, mount, coupling).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="sectionTitle">
+        <div>
+          <h2>About Me</h2>
+          <p class="sub">A professional bio with skills, interests, and where you want to take this next.</p>
+        </div>
+        <span class="pill"><span class="dot"></span> Professional Bio</span>
+      </div>
+
+      <div class="grid2">
+        <div class="mini">
+          <h3>Bio (edit this)</h3>
+          <p>
+            Hi — I’m <b>[Your Name]</b>. I build safety-first prototypes that mix hardware, code, and iterative testing.
+            I’m especially interested in human-centered engineering: making interactive systems feel intuitive, reliable, and safe.
+            This example project demonstrates how I document a build so other students can replicate the process.
+          </p>
+          <div class="tagRow">
+            <span class="tag">Hardware</span>
+            <span class="tag">Rapid prototyping</span>
+            <span class="tag">3D printing</span>
+            <span class="tag">Embedded code</span>
+          </div>
+        </div>
+
+        <div class="mini">
+          <h3>Skills & Tools (example)</h3>
+          <ul class="list">
+            <li>Arduino, breadboard wiring, motor drivers (H-bridge concepts)</li>
+            <li>CAD + 3D printing (fit tests → reinforced final prints)</li>
+            <li>Debug workflow: isolate variables, test in layers, document outcomes</li>
+            <li>Web documentation: clean visuals, timelines, and reproducible steps</li>
+          </ul>
+          <p class="tinyNote">Tip: Add links to GitHub, LinkedIn, or a short demo video.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <div style="font-weight:700; color:var(--text);">Driving Simulator Project (Example)</div>
+            <div style="margin-top:6px;">Built as a class-ready template: slideshows, code section, and a weekly timeline.</div>
+          </div>
+          <div class="pill"><span class="dot"></span> Hosted on GitHub Pages</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // ======== SLIDESHOW DATA ========
+    // Replace img paths with your own files in /timeline/
+    const projectSlides = [
+      {
+        img: "timeline/finalized.jpg",
+        title: "Finalized Product",
+        desc: "A compact steering-feedback prototype: joystick-controlled motor rotation delivers a convincing turn response while staying stable and safe."
+      },
+      {
+        img: "timeline/components.jpg",
+        title: "What It Does",
+        desc: "Maps joystick movement to motor direction + speed, producing clockwise/counterclockwise steering feedback with a controlled idle state."
+      },
+      {
+        img: "timeline/breadboard.jpg",
+        title: "Individual Components",
+        desc: "Arduino + wiring + motor + coupling + mount. Each part was iterated to reduce jitter, slip, and inconsistent direction switching."
+      },
+      {
+        img: "timeline/cad.jpg",
+        title: "3D-Printed Mount (Tension Lock)",
+        desc: "Designed to lock the car into place using tension to prevent slip under torque and keep the wheel aligned with the motor shaft."
+      }
+    ];
+
+    const devSlides = [
+      {
+        img: "timeline/linear-actuator.jpg",
+        title: "Linear Actuators (Early Concept)",
+        desc: "Explored a motion seat design using four actuators, then downscoped after feasibility + budget analysis."
+      },
+      {
+        img: "timeline/force-feedback-wheel.jpg",
+        title: "Force-Feedback Mechanism",
+        desc: "Investigated ways to create steering resistance; pivoted to a smaller rotating-motor proof-of-concept."
+      },
+      {
+        img: "timeline/hbridge.png",
+        title: "H-Bridge Direction Control",
+        desc: "Studied how H-bridges enable safe bidirectional motor control and used it to debug inconsistent reversal behavior."
+      },
+      {
+        img: "timeline/servos.jpg",
+        title: "Servo Joystick + Motors",
+        desc: "Compared multiple motors (torque vs control stability) and documented tradeoffs to pick a reliable path forward."
+      },
+      {
+        img: "timeline/old-mount.jpg",
+        title: "Past 3D Print Model",
+        desc: "Earlier mount was customized for a different toy car; redesign was required when the platform changed."
+      }
+    ];
+
+    // ======== WEEKLY TIMELINE DATA (SAMPLE / FICTIONAL) ========
+    const timelineWeeks = [
+      // October (5)
+      {
+        label: "Oct W1",
+        date: "Oct 1–Oct 5",
+        title: "Kickoff + requirements",
+        text: "Defined success criteria (safe forces, stable mounting, repeatable demo). Collected VR sim references and drafted a test plan.",
+        img: "timeline/vr.jpg"
+      },
+      {
+        label: "Oct W2",
+        date: "Oct 6–Oct 12",
+        title: "Motion-seat concept + budget",
+        text: "Sketched 4-actuator seat idea and built a cost model. Flagged high-risk purchases and planned a smaller prototype fallback.",
+        img: "timeline/linear-actuator.jpg"
+      },
+      {
+        label: "Oct W3",
+        date: "Oct 13–Oct 19",
+        title: "Downscope to steering feedback",
+        text: "Pivoted to a rotating-motor steering-feedback prototype. Defined control loop: joystick → Arduino → driver → motor.",
+        img: "timeline/force-feedback-wheel.jpg"
+      },
+      {
+        label: "Oct W4",
+        date: "Oct 20–Oct 26",
+        title: "Electronics bring-up",
+        text: "Built a clean wiring baseline, verified stable power, and tuned joystick dead zones to reduce jitter.",
+        img: "timeline/breadboard.jpg"
+      },
+      {
+        label: "Oct W5",
+        date: "Oct 27–Nov 2",
+        title: "CAD mount v1 + fit test",
+        text: "Modeled a mount to align motor shaft and wheel. Printed a fast draft to test fit, then documented slip and flex issues.",
+        img: "timeline/cad.jpg"
+      },
+
+      // November (4)
+      {
+        label: "Nov W1",
+        date: "Nov 3–Nov 9",
+        title: "Joystick works + motor spins",
+        text: "Confirmed joystick reads in Serial Monitor. Motor spins reliably in one direction; reversal was inconsistent.",
+        img: "timeline/components.jpg"
+      },
+      {
+        label: "Nov W2",
+        date: "Nov 10–Nov 16",
+        title: "Bidirectional debugging + H-bridge",
+        text: "Researched H-bridge control and prototyped direction switching. Added debug indicators to confirm commanded direction.",
+        img: "timeline/hbridge.png"
+      },
+      {
+        label: "Nov W3",
+        date: "Nov 17–Nov 23",
+        title: "Motor comparison week",
+        text: "Tested SM-S2309S, SG90, S51, Geekservo; scored torque/smoothness/heat. Selected a stable configuration to rebuild around.",
+        img: "timeline/servos.jpg"
+      },
+      {
+        label: "Nov W4",
+        date: "Nov 24–Nov 30",
+        title: "Mount redesign plan + code cleanup",
+        text: "Planned a tension-lock mount to stop slip. Refactored code into readable functions and preserved a known-good wiring setup.",
+        img: "timeline/code.jpg"
+      },
+
+      // December (5)
+      {
+        label: "Dec W1",
+        date: "Dec 1–Dec 7",
+        title: "Hands-on wiring trials",
+        text: "Ran rapid wiring experiments to isolate failures. Rebuilt messy connections and documented dead ends to avoid repeats.",
+        img: "timeline/rebuild.jpg"
+      },
+      {
+        label: "Dec W2",
+        date: "Dec 8–Dec 14",
+        title: "Clean-slate rebuild",
+        text: "Reset the entire build for clarity: clean wiring, re-tuned joystick mapping, stable motor control, and reproducible steps.",
+        img: "timeline/checklist.jpg"
+      },
+      {
+        label: "Dec W3",
+        date: "Dec 15–Dec 21",
+        title: "Coupling tests (anti-slip)",
+        text: "Tested multiple motor attachments (friction sleeve, printed adapter). Measured slip threshold and improved alignment.",
+        img: "timeline/coupling.jpg"
+      },
+      {
+        label: "Dec W4",
+        date: "Dec 22–Dec 28",
+        title: "Final mount v2 (tension lock)",
+        text: "Printed and validated mount v2. Ran repeated demo cycles (left → neutral → right) and added small usability improvements.",
+        img: "timeline/final-mount.jpg"
+      },
+      {
+        label: "Dec W5",
+        date: "Dec 29–Dec 31",
+        title: "Polish + showcase prep",
+        text: "Organized photos/CAD/code, wrote replication checklist, and recorded short clips for the project page video embed.",
+        img: "timeline/checklist.jpg"
+      }
+    ];
+
+    // ======== CAROUSEL RENDER ========
+    function buildCarousel(containerId, counterId, slides, key){
+      const frame = document.getElementById(containerId);
+      const counter = document.getElementById(counterId);
+      frame.querySelectorAll(".slide").forEach(n => n.remove());
+
+      slides.forEach((s, idx) => {
+        const slide = document.createElement("div");
+        slide.className = "slide" + (idx === 0 ? " active" : "");
+        slide.innerHTML = `
+          <img src="${s.img}" alt="${s.title}" onerror="this.style.display='none';" />
+          <div class="hoverOverlay">
+            <h3>${s.title}</h3>
+            <p>${s.desc}</p>
+          </div>
+        `;
+        frame.appendChild(slide);
+      });
+
+      let i = 0;
+      const all = () => Array.from(frame.querySelectorAll(".slide"));
+      const render = () => {
+        const slidesEls = all();
+        slidesEls.forEach((el, idx) => el.classList.toggle("active", idx === i));
+        counter.textContent = `${i+1} / ${slides.length}`;
+      };
+
+      const prev = () => { i = (i - 1 + slides.length) % slides.length; render(); };
+      const next = () => { i = (i + 1) % slides.length; render(); };
+
+      document.querySelector(`[data-prev="${key}"]`).addEventListener("click", prev);
+      document.querySelector(`[data-next="${key}"]`).addEventListener("click", next);
+
+      // Keyboard support
+      frame.tabIndex = 0;
+      frame.addEventListener("keydown", (e) => {
+        if(e.key === "ArrowLeft") prev();
+        if(e.key === "ArrowRight") next();
+      });
+
+      render();
+    }
+
+    // ======== TIMELINE RENDER ========
+    function buildTimeline(){
+      const host = document.getElementById("timelineDots");
+      host.innerHTML = "";
+      timelineWeeks.forEach((w) => {
+        const cell = document.createElement("div");
+        cell.className = "dotCell";
+
+        cell.innerHTML = `
+          <div class="tooltip" role="dialog" aria-label="${w.label} details">
+            <img src="${w.img}" alt="${w.title}" onerror="this.style.display='none';" />
+            <div class="tooltipBody">
+              <div class="tooltipKicker">${w.date}</div>
+              <div class="tooltipTitle"><b>${w.title}</b></div>
+              <p class="tooltipText">${w.text}</p>
+            </div>
+          </div>
+          <button class="tDot" aria-label="${w.label}: ${w.title} (${w.date})"></button>
+          <div class="tLabel">${w.label}</div>
+        `;
+        host.appendChild(cell);
+      });
+    }
+
+    // ======== COPY CODE BUTTON ========
+    document.getElementById("copyCodeBtn").addEventListener("click", async () => {
+      const text = document.getElementById("codeBlock").innerText;
+      try{
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById("copyCodeBtn");
+        const old = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = old, 900);
+      }catch(e){
+        alert("Copy failed — select the code and copy manually.");
+      }
+    });
+
+    // Init
+    buildCarousel("projectCarousel", "projectCounter", projectSlides, "project");
+    buildCarousel("devCarousel", "devCounter", devSlides, "dev");
+    buildTimeline();
+  </script>
+</body>
+</html>
